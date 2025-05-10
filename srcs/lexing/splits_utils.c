@@ -5,7 +5,12 @@ int toknize(char* input, t_all *as)
     split_input(input, &as->token, as->tmp);
 	expand_var(as->token, as->cp_envp);
 	remove_quotes(as->token);
-	find_path(as->cp_envp, "cat");
+	
+	t_command *cmds = split_cmds(as->token);
+	print_commands(cmds);
+        
+	execute_commands(cmds, as->cp_envp);
+
 
 
 	// split_cmds(as->token, &as->cmd);

@@ -1,5 +1,16 @@
 #include "../includes/minishell.h"
-
+t_command *new_command(void)
+{
+    t_command *cmd = malloc(sizeof(t_command));
+    if (!cmd)
+        return NULL;
+    cmd->args = NULL;
+    cmd->infile = NULL;
+    cmd->outfile = NULL;
+    cmd->append = 0;
+    cmd->next = NULL;
+    return cmd;
+}
 char **add_arg(char **args, char *value)
 //appends a new argument string to the end of the args array (resizing as needed)
 {
@@ -17,7 +28,8 @@ char **add_arg(char **args, char *value)
 
         while (i < count)
         // copy existing args to new array
-                new_args[i] = args[i++];
+                {new_args[i] = args[i];
+                        i++;}
         new_args[count] = ft_strdup(value); //adds the new arg to the end
         new_args[count + 1] = NULL;
 
@@ -100,9 +112,11 @@ t_command *split_cmds(t_token *token)
 void execute_commands(t_command *cmd_list, t_envp *env)
 {
         int i;
-        int num_commands = 0 t_command *cmd = cmd_list;
+        int num_commands = 0;
+         t_command *cmd = cmd_list;
 
         i = 0;
+        int status;
         while (cmd)
         // iterate through the command list
         {
@@ -146,15 +160,19 @@ void execute_commands(t_command *cmd_list, t_envp *env)
                                 close(fd_out);
                         }
 
-                        if (execve(cmd->args[0], cmd->args, env->tmp_envp) == -1)
-                        {
-                                perror("execve");
-                                exit(EXIT_FAILURE);
-                        }
+    
 
                         // if built in cmd
                         char *path = find_path(env, cmd->args[0]);
+                        if (!path)
+                        {
+                                perror("path not found");
+                                exit(127) ;
+                        }
+                        printf("%s",path);
                         execv(path, cmd->args);
+                        perror("execve");
+                        exit(EXIT_FAILURE);
                 }
                 num_commands++;
                 cmd = cmd->next;

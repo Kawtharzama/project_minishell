@@ -16,6 +16,7 @@ void	print_list(t_token *head)
 
 
 
+
 int split_input(char* input,t_token **token, t_tmptoken *tmp)
 {
     *token = NULL;	

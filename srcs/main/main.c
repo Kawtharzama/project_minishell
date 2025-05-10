@@ -1,5 +1,45 @@
 #include "../includes/minishell.h"
 
+void print_commands(t_command *cmd_list)
+{
+    int i;
+    int cmd_num = 1;
+    t_command *cmd = cmd_list;
+
+    while (cmd)
+    {
+        printf("=== Command %d ===\n", cmd_num);
+
+        // Print arguments
+        if (cmd->args)
+        {
+            printf("Arguments:\n");
+            for (i = 0; cmd->args[i]; i++)
+                printf("  [%d]: %s\n", i, cmd->args[i]);
+        }
+        else
+        {
+            printf("Arguments: None\n");
+        }
+
+        // Print infile
+        if (cmd->infile)
+            printf("Infile: %s\n", cmd->infile);
+        else
+            printf("Infile: None\n");
+
+        // Print outfile
+        if (cmd->outfile)
+            printf("Outfile: %s (append: %s)\n", cmd->outfile, cmd->append ? "yes" : "no");
+        else
+            printf("Outfile: None\n");
+
+        printf("\n");
+        cmd = cmd->next;
+        cmd_num++;
+    }
+}
+
 
 
 char *get_full_path(char *dir, char *cmd) {
@@ -38,7 +78,7 @@ char *find_path(t_envp *cp_envp, char *cmd) {
         {
             printf("%s\n", fullpath);
             return fullpath;
-        }
+        } //delete it before submit
         free(fullpath);
         if (end) 
             start = end + 1; 
@@ -90,8 +130,7 @@ int main(int argv, char** argc, char** envp)
         // char *x= expand_variables(input,as);//move to before execve
         // printf("%s",x);
         toknize(input,as);
-        t_command *cmds = split_cmds(as->token);
-        execute_commands(cmds, as->cp_envp);
+       
         // print_list(as->token);
        
         

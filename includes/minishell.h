@@ -51,18 +51,7 @@ typedef struct s_command
     struct s_command *next;
 } t_command;
 
-t_command *new_command(void)
-{
-    t_command *cmd = malloc(sizeof(t_command));
-    if (!cmd)
-        return NULL;
-    cmd->args = NULL;
-    cmd->infile = NULL;
-    cmd->outfile = NULL;
-    cmd->append = 0;
-    cmd->next = NULL;
-    return cmd;
-}
+
 
 typedef struct s_all{
     struct s_token *token;
@@ -123,4 +112,6 @@ char **add_arg(char **args, char *value);
 
 t_command *split_cmds(t_token *token);
 void execute_commands(t_command *cmd_list, t_envp *env);
+t_command *new_command(void);
+void print_commands(t_command *cmd_list);
 #endif
