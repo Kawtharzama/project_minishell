@@ -58,7 +58,8 @@ typedef struct s_all{
     struct s_tmptoken *tmp;
     struct s_command *cmd;
     struct s_envp *cp_envp;
-    char *var_value;
+    // char *var_value;
+    int exit_status;
 
 
 }t_all;
@@ -78,6 +79,7 @@ int	parameter_token(char *input, int i, t_tmptoken *tmp, t_token **token);
 
 //split.c
 int split_input(char* input,t_token **token, t_tmptoken *tmp);
+// int split_input(char* input,t_token **token, t_tmptoken *tmp, t_command **cmd);
 void	print_list(t_token *head);
 //free
 void free_all(t_all *as);
@@ -85,11 +87,18 @@ void free_tokens(t_token *token);
 int clean(t_all *as);
 int clean_all(t_all *as);
 int free_envp(t_envp *cp_envp);
+void token_error(t_token *token, char *msg);
+int free_token_cmd(t_all *as);
+
+
 //qoutes
 int closing_qoutes(char *input, int i);
+// int find_closing_quote(char *input, int i, int flag, char quote_type);
 int find_closing_quote(char *input, int i, int flag, char quote_type);
+
 int	handle_quotes(char *input, int i, t_tmptoken *tmp, t_token **token);
 void replace_qoutes(t_token *token, int i, int j, int q);
+// void replace_qoutes(t_token *token);
 void remove_quotes(t_token *token);
 
 //splits 2
@@ -107,11 +116,14 @@ char *ft_getenv(const char *name,t_envp *cp_envp);
 
 char* find_path(t_envp *cp_envp, char *cmd);
 
-
+// signals
+void sig_handler_prompt (int signum);
+void setup_signals(void);
 char **add_arg(char **args, char *value);
 
-t_command *split_cmds(t_token *token);
+void split_cmds(t_token *token, t_command **cmd_list);
 void execute_commands(t_command *cmd_list, t_envp *env);
 t_command *new_command(void);
 void print_commands(t_command *cmd_list);
+
 #endif

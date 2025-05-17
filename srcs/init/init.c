@@ -7,13 +7,13 @@ void	init_token(t_tmptoken *tmp)
 }
 
 t_all *init_strcuts(t_all *as)
-{   
-
-	
-	
+{     
     as = malloc(sizeof(t_all)); //free
     if(!as) exit(1); 
-    // as->token = NULL;
+    as->exit_status = 0;
+    as->token = NULL;
+    as->cmd =NULL;
+
     as->tmp = malloc(sizeof(t_tmptoken)); //free
     if (!as->tmp)
     {
@@ -23,9 +23,6 @@ t_all *init_strcuts(t_all *as)
   
     as->cp_envp = malloc(sizeof(t_envp)); //free
 		if (!as->cp_envp)
-        exit(1);
-		// as->cp_envp->tmp_envp = NULL;
-		// return 1; 
-    
+            exit(1);//exit
     return as;
 }

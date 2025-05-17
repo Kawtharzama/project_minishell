@@ -2,20 +2,25 @@
 
 int toknize(char* input, t_all *as)
 {
-    split_input(input, &as->token, as->tmp);
+    int i =0;
+	i = split_input(input, &as->token, as->tmp);
+	if(i == -1)
+	{
+		free_token_cmd(as);
+		return -1;
+	}
 	expand_var(as->token, as->cp_envp);
 	remove_quotes(as->token);
 	
-	t_command *cmds = split_cmds(as->token);
-	print_commands(cmds);
+	split_cmds(as->token, &as->cmd); 
+	print_commands(as->cmd);
         
-	execute_commands(cmds, as->cp_envp);
+	execute_commands(as->cmd, as->cp_envp);
 
 
 
-	// split_cmds(as->token, &as->cmd);
 	
-    return 0;
+    return 0; //exit
 }
 
 void token_types(t_token *token) 
@@ -56,7 +61,7 @@ int	parameter_token(char *input, int i, t_tmptoken *tmp, t_token **token)
 		return (-1);
 	}
 	if(add_node(token, tmp->value) == -1)
-	{return -1;} //add if -1
+		{return -1;} 
 	free(tmp->value);
 	tmp->value = NULL;
 	return (i);
@@ -81,6 +86,9 @@ int	str(char *input, int i, t_tmptoken *tmp, t_token **token)
 		if (input[i] == '"' || input[i] == '\'')
 		{
 		    i = closing_qoutes(input,i);
+			if(i == -1)
+				{
+				return -1;}//??
 			flag = 1;
 		}
 		i++;
@@ -95,7 +103,7 @@ int	str(char *input, int i, t_tmptoken *tmp, t_token **token)
 		return (-1);
 	}
 	if(add_node(token, tmp->value) == -1)
-	{return -1;} 
+		{return -1;} 
 	free(tmp->value);
 	tmp->value = NULL;
 	return (i - 1);

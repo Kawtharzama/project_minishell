@@ -19,6 +19,8 @@ char *ft_getenv(const char *name,t_envp *cp_envp)
 
 int expand_var(t_token *token , t_envp *cp_envp)
 {
+    char *var_value ;
+
     while (token)
     {
         if (token->type == WORD)
@@ -27,7 +29,6 @@ int expand_var(t_token *token , t_envp *cp_envp)
             int in_double = 0;
             int len = ft_strlen(token->value);
 
-            char *var_value = ft_strdup("");
 
             while (token->value[i])
             {
@@ -56,41 +57,54 @@ int expand_var(t_token *token , t_envp *cp_envp)
                  }
                     int end = i;
                     char *var = ft_substr(token->value, start,(end - start));
-                   
+                    char *env_value = ft_getenv(var, cp_envp);
+                        free(var);
                     
-                    var_value = ft_getenv(var, cp_envp); // do i need strdup?
+                    var_value = ft_strdup(env_value); // do i need strdup?
                     // printf("%s",var);
                     // if (var_value)
                 //     // printf("Value of HOME: %s\n", var_value); // join together
                 // else
                 //     printf("Variable not found.\n");
                 // free(var_value);
-                if(start != 1)
+                if(start > 1)
                 {
-                    char *before = ft_substr(token->value, 0, start -1);
+                    char *before = ft_substr(token->value, 0, start - 1);
+
+                    char *tmp=var_value;
                     // if (before)
                         // printf("Value of bef: %s\n", before);
                     var_value = ft_strjoin(before, var_value);
+                    free(tmp);
+                    free(before);
 
 
 
                 }
-                if(end + 1 != 0)
+                if(end + 1 < len)
                 {
                     char *after = ft_substr(token->value, end, len);
                     // if (after)
-                        // printf("Value of af: %s\n", after);
+                        
+                    char *tmp=var_value;// printf("Value of af: %s\n", after);
                         var_value = ft_strjoin(var_value, after);
+                        free(tmp);
+                        free(after);
                         
                 }
+                free(token->value);
                 token->value =  var_value;
+
                 printf("Value: %s\n", var_value);
+                
 
                 }
                 i++;
             }
         }
+        
         token = token->next;
+     
     }
     return 0;
 }

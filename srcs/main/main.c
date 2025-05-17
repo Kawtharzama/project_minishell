@@ -87,18 +87,21 @@ char *find_path(t_envp *cp_envp, char *cmd) {
     }
     return NULL;
 }
-
-
-
-
-   
-
-
-
-
-
-
-   
+void sig_handler_prompt (int signum)
+{
+    if(signum == SIGINT )
+    {
+        write(1, "\n", 1);                
+        rl_replace_line("", 0);          
+        rl_on_new_line();               
+        rl_redisplay(); 
+    }
+}
+void setup_signals(void)
+{
+    signal(SIGINT, sig_handler_prompt);
+    signal(SIGQUIT, SIG_IGN);
+}
 
 int main(int argv, char** argc, char** envp)
 {
@@ -108,24 +111,28 @@ int main(int argv, char** argc, char** envp)
     char *input;
     t_all *as;
     as = NULL;
+    
     as = init_strcuts(as);
+    // as->exit_status = 0;
     if(!as)
     {
-        printf("not as");
-        exit(1);//free then exit
+        perror("error in init all struct");
+        clean(as);
+        exit(1);// exit
     }
     copy_envp(envp, as);
 	// print_envp(as->cp_envp);
+    // char *path = ft_getenv("PATH",as->cp_envp);
     while(1)
     {
-        input = readline("input: "); //add path
+        setup_signals();
+        input = readline("input : "); //is it correct?
         if (input == NULL)
 		{
-			write(1, "exit\n", 5); 
-            free(input);
-
+			write(1, "exit\n", 5);
 			break;
-		}//add empty string
+		}
+        
         add_history(input);
         // char *x= expand_variables(input,as);//move to before execve
         // printf("%s",x);
@@ -137,10 +144,10 @@ int main(int argv, char** argc, char** envp)
 
 
         free(input);
-        clean(as);
-        
-        //clean all except in init
+        free_token_cmd(as);// clean token & cmds
+       
     }
-    clean(as); //causes seg fault
-    return 0;
+    int g_exit = as->exit_status;
+    clean(as); //clean all
+    return (g_exit);
 }

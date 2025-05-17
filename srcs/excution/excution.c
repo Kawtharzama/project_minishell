@@ -11,6 +11,8 @@ t_command *new_command(void)
     cmd->next = NULL;
     return cmd;
 }
+
+
 char **add_arg(char **args, char *value)
 //appends a new argument string to the end of the args array (resizing as needed)
 {
@@ -57,10 +59,10 @@ void append_command(t_command **cmd_list, t_command *new_cmd)
         tmp->next = new_cmd; // link the new command to the end of the list
 }
 
-t_command *split_cmds(t_token *token)
+void split_cmds(t_token *token, t_command **cmd_list)
 //splits the token list into a command list
 {
-        t_command *cmd_list = NULL; //starts with an empty command list
+         *cmd_list = NULL; //starts with an empty command list
         t_command *current_cmd = new_command();
 
         while (token)
@@ -76,8 +78,8 @@ t_command *split_cmds(t_token *token)
                         if (!token->next || token->next->type != WORD)
                         {
                                 printf("Syntax error: expected filename after redirection\n");
-                                free(current_cmd); //full cleanup function
-                                return NULL;
+                                // free(current_cmd); //full cleanup function
+                                return ;
                         }
 
                         if (ft_strncmp(token->value, ">", 1) == 0)
@@ -96,7 +98,7 @@ t_command *split_cmds(t_token *token)
                 else if (token->type == PIPE)
                 //finially, if we hit a pipe, we need to add the current command to the list
                 {
-                        append_command(&cmd_list, current_cmd);
+                        append_command(cmd_list, current_cmd);
                         current_cmd = new_command();
                 }
 
@@ -104,9 +106,9 @@ t_command *split_cmds(t_token *token)
         }
 
         if (current_cmd->args) // only add if it has something
-                append_command(&cmd_list, current_cmd);
+                append_command(cmd_list, current_cmd);
 
-        return cmd_list; //return the command list
+        return ; 
 }
 
 void execute_commands(t_command *cmd_list, t_envp *env)
@@ -114,6 +116,7 @@ void execute_commands(t_command *cmd_list, t_envp *env)
         int i;
         int num_commands = 0;
          t_command *cmd = cmd_list;
+        //  t_command *start = cmd_list;
 
         i = 0;
         int status;
@@ -138,7 +141,7 @@ void execute_commands(t_command *cmd_list, t_envp *env)
                                 if (fd_in == -1)
                                 {
                                         perror("open infile");
-                                        exit(EXIT_FAILURE);
+                                        exit(EXIT_FAILURE);//exit
                                 }
                                 dup2(fd_in, STDIN_FILENO);
                                 close(fd_in);
@@ -154,7 +157,7 @@ void execute_commands(t_command *cmd_list, t_envp *env)
                                 if (fd_out == -1)
                                 {
                                         perror("open outfile");
-                                        exit(EXIT_FAILURE);
+                                        exit(EXIT_FAILURE); //exit
                                 }
                                 dup2(fd_out, STDOUT_FILENO);
                                 close(fd_out);
@@ -167,12 +170,13 @@ void execute_commands(t_command *cmd_list, t_envp *env)
                         if (!path)
                         {
                                 perror("path not found");
-                                exit(127) ;
+                                exit(127) ;//exit
                         }
                         printf("%s",path);
+                        // setup_signals();
                         execv(path, cmd->args);
                         perror("execve");
-                        exit(EXIT_FAILURE);
+                        exit(EXIT_FAILURE);//exit
                 }
                 num_commands++;
                 cmd = cmd->next;
@@ -185,6 +189,7 @@ void execute_commands(t_command *cmd_list, t_envp *env)
                 // ensures no zombie processes are left
                 i++;
         }
+        // free_cmds(start);
 }
 // execve() works only with absolute paths like bin/ls
 //  need to add path to the command PATH

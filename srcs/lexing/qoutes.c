@@ -2,7 +2,7 @@
 
 int find_closing_quote(char *input, int i, int flag, char quote_type)
 {
-    while (input[i++])
+    while (input[i])
     {
        if ((input[i] == '"' || input[i] == '\'') && flag == 0)
 		{
@@ -20,9 +20,11 @@ int find_closing_quote(char *input, int i, int flag, char quote_type)
 		}
         else if(input[i+1] && flag == 0 && (input[i+1] == ' ' || is_parameter(input[i+ 1])))
     		break;
+            i++;     
     }
     if (flag  == 1)
-        printf("synatx error unclosed quote\n");//write a function that write this then clean
+            return -1; //??
+        
     return i;
 }
 
@@ -44,15 +46,16 @@ int	handle_quotes(char *input, int i, t_tmptoken *tmp, t_token **token)
 	tmp->start = i;
 	i = closing_qoutes(input,i);
 	if (i == -1)
-		return (-1); 
+    {
+		return (-1); }
 	
 	tmp->end = i;
 	tmp->value = ft_substr(input, tmp->start, (tmp->end - tmp->start
 				+ 1));
 	if (!tmp->value)
 	{
-		printf("Memory allocation failed for token.value\n");
-		return (i);
+		perror("Memory allocation failed for token.value\n");
+		return (-1);
 	}
 	if(add_node(token, tmp->value) == -1)
 	{return -1;} 
@@ -61,54 +64,89 @@ int	handle_quotes(char *input, int i, t_tmptoken *tmp, t_token **token)
 	return (i);
 }
 
-void replace_qoutes(t_token *token, int i, int j, int q)
-{
-	char c;
+// void replace_qoutes(t_token *token, int i, int j, int q)
+// {
+// 	char c;
 
-        while (token->value[i] != '\0')
-        {
-            if (q == 0 && (token->value[i] == '"' || token->value[i] == '\''))
-            {
-                q = 1;
-                c = token->value[i++];
-                while (token->value[i] != '\0' && token->value[i] != c)
-                {
-                    token->value[j++] = token->value[i++];
-                }
-                if (token->value[i] == c) i++;
-                q = 0;
-            }
-            else
-                token->value[j++] = token->value[i++];
+//         while (token->value[i] != '\0')
+//         {
+//             if (q == 0 && (token->value[i] == '"' || token->value[i] == '\''))
+//             {
+//                 q = 1;
+//                 c = token->value[i++];
+//                 while (token->value[i] != '\0' && token->value[i] != c)
+//                 {
+//                     token->value[j++] = token->value[i++];
+//                 }
+//                 if (token->value[i] == c) i++;
+//                 q = 0;
+//             }
+//             else
+//                 token->value[j++] = token->value[i++];
             
-        }
-        token->value[j] = '\0'; 
-    }
+//         }
+//         token->value[j] = '\0'; 
+//     }
 
+// void remove_quotes(t_token *token)
+// {
+//     int i;
+// 	int j;
+// 	int q;
+    
+// 	while (token != NULL)
+//     {
+//         if (token->value == NULL || token->value[0] == '\0')
+//         {
+//             token = token->next;
+//             continue;
+//         }
+
+//         i = 0;
+//         j = 0;
+//         q = 0;
+// 		if (token->type == WORD)
+// 			replace_qoutes(token, i, j, q);
+// 		token = token->next;
+
+
+// 	}	
+		
+// }
+ void replace_qoutes(t_token *token, int i, int j, int q)
+{
+   
+    char c;
+
+    if (!token || !token->value)
+        return;
+
+    while (token->value[i])
+    {
+        if (q == 0 && (token->value[i] == '"' || token->value[i] == '\''))
+        {
+            q = 1;
+            c = token->value[i++];
+            while (token->value[i] && token->value[i] != c)
+                token->value[j++] = token->value[i++];
+            if (token->value[i] == c)
+                i++;
+            q = 0;
+        }
+        else
+            token->value[j++] = token->value[i++];
+    }
+    token->value[j] = '\0';
+}
 void remove_quotes(t_token *token)
 {
-    int i;
-	int j;
-	int q;
-    
-	while (token != NULL)
+    while (token)
     {
-        if (token->value == NULL || token->value[0] == '\0')
-        {
-            token = token->next;
-            continue;
-        }
-
-        i = 0;
-        j = 0;
-        q = 0;
-		if (token->type == WORD)
-			replace_qoutes(token, i, j, q);
-		token = token->next;
-
-
-	}	
-		
+        if (token->value && token->value[0] && token->type == WORD)
+            replace_qoutes(token, 0, 0, 0);
+        token = token->next;
+    }
 }
+
 
 

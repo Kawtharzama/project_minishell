@@ -19,7 +19,7 @@ void	print_list(t_token *head)
 
 int split_input(char* input,t_token **token, t_tmptoken *tmp)
 {
-    *token = NULL;	
+    *token = NULL;
  	int		i;
 
  	i = 0;
@@ -36,7 +36,10 @@ int split_input(char* input,t_token **token, t_tmptoken *tmp)
         else
  			i = str(input, i, tmp, token);
  		if (i == -1)
- 			{exit(1);} //exit function (clear then exit)
+ 			{
+   				 
+				perror("Syntax_error"); //why success??
+				return -1;} //exit function (clear then exit)
  	i++;
  	}
 	 token_types(*token);
